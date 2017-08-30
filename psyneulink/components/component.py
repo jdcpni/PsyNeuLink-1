@@ -772,6 +772,19 @@ class Component(object):
     # IMPLEMENTATION NOTE: Primarily used to track and prevent recursive calls to assign_params from setters.
     prev_context = None
 
+    copy_exclude_keys = [
+        'owner'
+    ]
+
+    def __getstate__(self):
+        odict = self.__dict__.copy()
+        for k in self.copy_exclude_keys:
+            try:
+                del odict[k]
+            except KeyError:
+                pass
+        return odict
+
     def __init__(self,
                  default_variable,
                  param_defaults,
