@@ -148,7 +148,9 @@ class AdaptiveMechanism_Base(Mechanism_Base):
                  params,
                  name,
                  prefs,
-                 context):
+                 context,
+                 function=None,
+                 ):
         """Abstract class for AdaptiveMechanism
         """
 
@@ -165,7 +167,9 @@ class AdaptiveMechanism_Base(Mechanism_Base):
                          params=params,
                          name=name,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
 #     def _instantiate_output_states(self, context=None):
 #         super()._instantiate_output_states(context=context)

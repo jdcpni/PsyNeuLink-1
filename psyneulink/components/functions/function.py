@@ -609,7 +609,9 @@ class Function_Base(Function):
                  owner=None,
                  name=None,
                  prefs=None,
-                 context='Function_Base Init'):
+                 context='Function_Base Init',
+                 function=None,
+                 ):
         """Assign category-level preferences, register category, and call super.__init__
 
         Initialization arguments:
@@ -642,7 +644,9 @@ class Function_Base(Function):
                          param_defaults=params,
                          name=name,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
     def execute(self, variable=None, params=None, context=None):
         return self.function(variable=variable, params=params, context=context)
@@ -1038,7 +1042,9 @@ class UserDefinedFunction(Function_Base):
                          params=params,
                          owner=owner,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
         self.functionOutputType = None
 

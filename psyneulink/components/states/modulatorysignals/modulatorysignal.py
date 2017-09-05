@@ -377,7 +377,9 @@ class ModulatorySignal(OutputState):
                  params=None,
                  name=None,
                  prefs=None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
 
         # Deferred initialization
         try:
@@ -404,7 +406,9 @@ class ModulatorySignal(OutputState):
                          params=params,
                          name=name,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
         if self.init_status is InitStatus.INITIALIZED:
             self._assign_default_state_name(context=context)

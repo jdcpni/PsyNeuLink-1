@@ -108,7 +108,9 @@ class DefaultControlMechanism(ControlMechanism):
                  control_signals:tc.optional(list)=None,
                  params=None,
                  name=None,
-                 prefs:is_pref_set=None):
+                 prefs:is_pref_set=None,
+                 function=None,
+                 ):
 
         super(DefaultControlMechanism, self).__init__(# default_variable=default_variable,
                                                     # size=size,
@@ -117,7 +119,9 @@ class DefaultControlMechanism(ControlMechanism):
                                                     params=params,
                                                     name=name,
                                                     prefs=prefs,
-                                                    context=self)
+                                                    context=self,
+                                                    function=function,
+                                                    )
 
     def _execute(self,
                     variable=None,

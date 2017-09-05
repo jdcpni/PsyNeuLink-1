@@ -94,7 +94,9 @@ class ProcessingMechanism_Base(Mechanism_Base):
                  params=None,
                  name=None,
                  prefs=None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
         """Abstract class for processing mechanisms
 
         :param variable: (value)
@@ -114,7 +116,9 @@ class ProcessingMechanism_Base(Mechanism_Base):
                          params=params,
                          name=name,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
     def _validate_inputs(self, inputs=None):
         # Let mechanism itself do validation of the input

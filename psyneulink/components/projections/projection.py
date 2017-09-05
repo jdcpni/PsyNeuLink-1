@@ -574,7 +574,9 @@ class Projection_Base(Projection):
                  params=None,
                  name=None,
                  prefs=None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
         """Assign sender, receiver, and execute method and register Mechanism with ProjectionRegistry
 
         This is an abstract class, and can only be called from a subclass;
@@ -698,7 +700,9 @@ class Projection_Base(Projection):
                                               param_defaults=params,
                                               name=self.name,
                                               prefs=prefs,
-                                              context=context.__class__.__name__)
+                                              context=context.__class__.__name__,
+                                              function=function,
+                                              )
 
     def _validate_params(self, request_set, target_set=None, context=None):
         """Validate PROJECTION_SENDER and/or sender arg (current self.sender), and assign one of them as self.sender

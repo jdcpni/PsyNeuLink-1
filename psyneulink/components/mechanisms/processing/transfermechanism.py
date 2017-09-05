@@ -519,6 +519,7 @@ class TransferMechanism(ProcessingMechanism_Base):
             prefs=prefs,
             context=self,
             input_states=input_states,
+            function=function,
         )
 
     def _validate_params(self, request_set, target_set=None, context=None):

@@ -360,7 +360,9 @@ class GatingMechanism(AdaptiveMechanism_Base):
                          params=params,
                          name=name,
                          prefs=prefs,
-                         context=self)
+                         context=self,
+                         function=function,
+                         )
 
     def _validate_params(self, request_set, target_set=None, context=None):
         """Validate items in the GATING_SIGNALS param (**gating_signals** argument of constructor)

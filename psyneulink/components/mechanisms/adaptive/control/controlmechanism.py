@@ -533,7 +533,9 @@ class ControlMechanism(AdaptiveMechanism_Base):
                                                     params=params,
                                                     name=name,
                                                     prefs=prefs,
-                                                    context=self)
+                                                    context=self,
+                                                    function=function,
+                                                    )
 
         try:
             self.monitored_output_states

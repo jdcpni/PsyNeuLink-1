@@ -421,7 +421,9 @@ class LearningProjection(ModulatoryProjection_Base):
                  params:tc.optional(dict)=None,
                  name=None,
                  prefs:is_pref_set=None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
 
         # IMPLEMENTATION NOTE:
         #     the learning_function argument is implemented to preserve the ability to pass a learning function

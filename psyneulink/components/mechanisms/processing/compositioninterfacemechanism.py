@@ -153,7 +153,9 @@ class CompositionInterfaceMechanism(ProcessingMechanism_Base):
                                                   params=params,
                                                   name=name,
                                                   prefs=prefs,
-                                                  context=self)
+                                                  context=self,
+                                                  function=function,
+                                                  )
 
 
 

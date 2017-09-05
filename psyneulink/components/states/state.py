@@ -999,6 +999,7 @@ class State_Base(State):
                  name=None,
                  prefs=None,
                  context=None,
+                 function=None,
                  **kargs):
         """Initialize subclass that computes and represents the value of a particular State of a Mechanism
 
@@ -1111,7 +1112,9 @@ class State_Base(State):
                                          param_defaults=params,
                                          name=name,
                                          prefs=prefs,
-                                         context=context.__class__.__name__)
+                                         context=context.__class__.__name__,
+                                         function=function,
+                                         )
 
         # INSTANTIATE PROJECTIONS SPECIFIED IN projections ARG OR params[PROJECTIONS:<>]
         # FIX: 10/3/17 - ??MOVE TO COMPOSITION THAT IS IMPELEMENTED (INSTEAD OF BEING HANDLED BY STATE ITSELF)

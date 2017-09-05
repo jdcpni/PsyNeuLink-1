@@ -230,7 +230,9 @@ class AutoAssociativeProjection(MappingProjection):
                  params=None,
                  name=None,
                  prefs: is_pref_set = None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
 
         if owner is not None:
             if not isinstance(owner, Mechanism):
@@ -248,7 +250,9 @@ class AutoAssociativeProjection(MappingProjection):
                          params=params,
                          name=name,
                          prefs=prefs,
-                         context=context)
+                         context=context,
+                         function=function,
+                         )
 
     def execute(self, input=None, clock=CentralClock, time_scale=None, params=None, context=None):
         """

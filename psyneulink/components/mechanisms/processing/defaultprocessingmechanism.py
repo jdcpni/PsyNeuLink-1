@@ -71,7 +71,9 @@ class DefaultProcessingMechanism_Base(Mechanism_Base):
                  size=None,
                  params=None,
                  name=None,
-                 prefs:is_pref_set=None):
+                 prefs:is_pref_set=None,
+                 function=None,
+                 ):
         """Add Linear as default function, assign default name, and call super.__init__
 
         :param default_variable: (value)
@@ -88,4 +90,6 @@ class DefaultProcessingMechanism_Base(Mechanism_Base):
                                                               params=params,
                                                               name=name,
                                                               prefs=prefs,
-                                                              context=self)
+                                                              context=self,
+                                                              function=function,
+                                                              )

@@ -673,7 +673,9 @@ class InputState(State_Base):
                                          params=params,
                                          name=name,
                                          prefs=prefs,
-                                         context=context)
+                                         context=self,
+                                         function=function,
+                                         )
 
         if self.name is self.componentName or self.componentName + '-' in self.name:
             self._assign_default_state_name(context=context)

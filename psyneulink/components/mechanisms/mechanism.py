@@ -1099,7 +1099,9 @@ class Mechanism_Base(Mechanism):
                  params=None,
                  name=None,
                  prefs=None,
-                 context=None):
+                 context=None,
+                 function=None,
+                 ):
         """Assign name, category-level preferences, and variable; register Mechanism; and enforce category methods
 
         This is an abstract class, and can only be called from a subclass;
@@ -1199,7 +1201,9 @@ class Mechanism_Base(Mechanism):
                                              param_defaults=params,
                                              prefs=prefs,
                                              name=name,
-                                             context=context)
+                                             context=context,
+                                             function=function,
+                                             )
 
         # FUNCTIONS:
 

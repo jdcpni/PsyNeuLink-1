@@ -667,7 +667,10 @@ class DDM(ProcessingMechanism_Base):
                                   prefs=prefs,
                                   size=size,
                                   # context=context)
-                                  context=self)
+                                  context=self,
+                                  function=function,
+                                  )
+
         self._instantiate_plotting_functions()
         # # TEST PRINT
         # print("\n{} user_params:".format(self.name))
