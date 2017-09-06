@@ -1260,7 +1260,7 @@ class Component(object):
                 if arg_name is FUNCTION and not inspect.isclass(default(arg)):
                     # FIX: REFACTOR Component._instantiate_function TO USE COPY OF INSTANTIATED function
                     fct_cls, fct_params = _convert_function_to_class(default(arg), 'function arg')
-                    self.paramClassDefaults[arg] = fct_cls
+                    self.paramClassDefaults[arg] = default(arg)
                     if fct_params:
                         self.paramClassDefaults[FUNCTION_PARAMS] = fct_params
 
@@ -1339,7 +1339,7 @@ class Component(object):
                     #                       TO ALLOW Function SPECIFICATION (VS. ONLY CLASS)
                     if isinstance(function, Function):
                         # Set it to the class (for compatibility with current implementation of _instantiate_function()
-                        params[FUNCTION] = function.__class__
+                        params[FUNCTION] = function
                         # Create ReadOnlyDict for FUNCTION_PARAMS and copy function's params into it
                         params[FUNCTION_PARAMS] = ReadOnlyOrderedDict(name=FUNCTION_PARAMS)
                         for param_name in sorted(list(function.user_params_for_instantiation.keys())):
