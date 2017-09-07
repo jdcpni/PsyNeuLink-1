@@ -536,7 +536,7 @@ class ParameterState(State_Base):
                                       "with its expected format ({})".
                                       format(name, self.componentName, self.owner.name, self.value, reference_value))
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         """Insure function is LinearCombination and that its output is compatible with param with which it is associated
 
         Notes:
@@ -547,7 +547,7 @@ class ParameterState(State_Base):
         :param context:
         :return:
         """
-        super()._instantiate_function(context=context)
+        super()._instantiate_function(function=function, context=context)
 
         # # Insure that output of function (self.value) is compatible with relevant parameter's reference_value
         if not iscompatible(self.value, self.reference_value):

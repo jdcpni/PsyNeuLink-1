@@ -336,15 +336,17 @@ It also contains:
 COMMENT
 
 """
+import copy
+
 import inspect
 import numbers
+import numpy as np
+import typecheck as tc
+import types
 import warnings
 
 from collections import Iterable, OrderedDict
 from enum import Enum, IntEnum
-
-import numpy as np
-import typecheck as tc
 
 from psyneulink.globals.registry import register_category
 from psyneulink.globals.keywords import COMMAND_LINE, DEFERRED_INITIALIZATION, DEFERRED_DEFAULT_NAME, COMPONENT_INIT, \
@@ -466,7 +468,8 @@ class ParamsDict(UserDict):
         # keep local dict of entries
         super().__setitem__(key, item)
         # assign value to attrib
-        setattr(self.owner, key, item)
+        if key is not FUNCTION:
+            setattr(self.owner, key, item)
 
 
 parameter_keywords = set()
@@ -936,7 +939,7 @@ class Component(object):
         # INSTANTIATE FUNCTION
         #    - assign initial function parameter values from ParameterStates,
         #    - assign function's output to self.value (based on call of self.execute)
-        self._instantiate_function(context=context)
+        self._instantiate_function(function=function, context=context)
 
         # INSTANTIATE ATTRIBUTES AFTER FUNCTION
         # Stub for methods that need to be executed after instantiating function
@@ -1133,14 +1136,6 @@ class Component(object):
             self.init_status = InitStatus.INITIALIZING
 
             del self.init_args['self']
-
-            # Delete function since super doesn't take it as an arg;
-            #   the value is stored in paramClassDefaults in assign_ags_to_params_dicts,
-            #   and will be restored in _instantiate_function
-            try:
-                del self.init_args[FUNCTION]
-            except KeyError:
-                pass
 
             try:
                 del self.init_args['__class__']
@@ -1981,7 +1976,7 @@ class Component(object):
 
         # If the object's function is being assigned, and it is a class, instantiate it as a Function object
         if FUNCTION in validated_set and inspect.isclass(self.function):
-            self._instantiate_function(context=COMMAND_LINE)
+            self._instantiate_function(function=self.function, context=COMMAND_LINE)
 
         # FIX: WHY SHOULD IT BE CALLED DURING STANDRD INIT PROCEDURE?
         # # MODIFIED 5/5/17 OLD:
@@ -2151,7 +2146,7 @@ class Component(object):
                 if param_name in {VARIABLE, NAME, VALUE, PARAMS, SIZE}:  # added SIZE here (7/5/17, CW)
                     continue
                 # function is a class, so function_params has not yet been implemented
-                if param_name is FUNCTION_PARAMS and inspect.isclass(self.function):
+                if param_name is FUNCTION_PARAMS and (self.function is None or inspect.isclass(self.function)):
                     continue
                 raise ComponentError("{0} is not a valid parameter for {1}".format(param_name, self.__class__.__name__))
 
@@ -2487,7 +2482,7 @@ class Component(object):
     def _instantiate_attributes_before_function(self, context=None):
         pass
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         """Instantiate function defined in <subclass>.function or <subclass>.paramsCurrent[FUNCTION]
 
         Instantiate params[FUNCTION] if present, and assign it to self.function
@@ -2508,173 +2503,29 @@ class Component(object):
                  this is done by Function.execute;  any subclass override should do the same, so that...
             - self.value == value[0] returned by self.execute
 
-        :param request_set:
-        :return:
         """
-        try:
-            function = self.function
-        # self.function is NOT implemented
-        except KeyError:
-            function = None
-        # self.function IS implemented
-        else:
-            # If FUNCTION is an already instantiated method:
-            if isinstance(function, method_type):
-                if issubclass(type(function.__self__), COMPONENT_BASE_CLASS):
-                    pass
-                # If it is NOT a subclass of Function,
-                # - issue warning if in VERBOSE mode
-                # - pass through to try self.function below
-                else:
-                    if self.prefs.verbosePref:
-                        warnings.warn("{0} ({1}) is not a subclass of Function".
-                                      format(FUNCTION,
-                                             self.function.__class__.__name__,
-                                             self.name))
+        from psyneulink.components.functions.function import UserDefinedFunction
+        from psyneulink.components.shellclasses import Function
 
-                    function = None
+        if isinstance(self, Function):
+            self.function_object = self
+            return
 
-            # If FUNCTION is a Function object, assign it to self.function (overrides hard-coded implementation)
-            elif isinstance(function, COMPONENT_BASE_CLASS):
-                self.function = function
+        if function is None:
+            function = self.ClassDefaults.function
 
-            # If FUNCTION is a Function class:
-            # - instantiate method using:
-            #    - self.instance_defaults.variable
-            #    - params[FUNCTION_PARAMS] (if specified)
-            # - issue warning if in VERBOSE mode
-            # - assign to self.function and params[FUNCTION]
-            elif inspect.isclass(function) and issubclass(function, COMPONENT_BASE_CLASS):
-                #  Check if params[FUNCTION_PARAMS] is specified
-                try:
-                    function_param_specs = self.function_params.copy()
-                except (KeyError, AttributeError):
-                    # FUNCTION_PARAMS not specified, so nullify
-                    function_param_specs = {}
-                else:
-                    # FUNCTION_PARAMS are bad (not a dict):
-                    if not isinstance(function_param_specs, dict):
-                        # - nullify FUNCTION_PARAMS
-                        function_param_specs = {}
-                        # - issue warning if in VERBOSE mode
-                        if self.prefs.verbosePref:
-                            warnings.warn("{0} in {1} ({2}) is not a dict; it will be ignored".
-                                          format(FUNCTION_PARAMS, self.name, function_param_specs))
-                    # parse entries of FUNCTION_PARAMS dict
-                    else:
-                        # Get param value from any params specified in a tuple or a dict
-                        from psyneulink.components.shellclasses import Projection
-                        for param_name, param_spec in function_param_specs.items():
-                            # Get param value from (param, projection) tuple
-                            if (isinstance(param_spec, tuple) and len(param_spec) is 2 and
-                                    (param_spec[1] in {MAPPING_PROJECTION, CONTROL_PROJECTION, LEARNING_PROJECTION} or
-                                         isinstance(param_spec[1], Projection) or
-                                         (inspect.isclass(param_spec[1]) and issubclass(param_spec[1], Projection)))
-                                ):
-                                from psyneulink.components.states.parameterstate import ParameterState
-                                function_param_specs[param_name] =  param_spec[0]
-                            # Get param value from VALUE entry of a parameter specification dictionary
-                            elif isinstance(param_spec, dict) and VALUE in param_spec:
-                                function_param_specs[param_name] =  param_spec[VALUE]
-
-                # Instantiate function from class specification
-                function_instance = function(default_variable=self.instance_defaults.variable,
-                                             params=function_param_specs,
-                                             # IMPLEMENTATION NOTE:
-                                             #    Don't bother with this, since it has to be assigned explicitly below
-                                             #    anyhow, for cases in which function already exists
-                                             #    and would require every function to have the owner arg in its __init__
-                                             owner=self,
-                                             context=context)
-                self.function = function_instance.function
-
-                # If in VERBOSE mode, report assignment
-                if self.prefs.verbosePref:
-                    object_name = self.name
-                    if self.__class__.__name__ is not object_name:
-                        object_name = object_name + " " + self.__class__.__name__
-                    try:
-                        object_name = object_name + " of " + self.owner.name
-                    except AttributeError:
-                        pass
-                    warnings.warn("{0} assigned as function for {1}".
-                                  format(self.function.__self__.componentName,
-                                         object_name))
-
-            # FUNCTION is a generic function (presumably user-defined), so "wrap" it in UserDefinedFunction:
-            #   Note: calling UserDefinedFunction.function will call FUNCTION
-            elif inspect.isfunction(function):
-
-
-                from psyneulink.components.functions.function import UserDefinedFunction
-                self.function = UserDefinedFunction(function=function, context=context).function
-
-            # If FUNCTION is NOT a Function class reference:
-            # - issue warning if in VERBOSE mode
-            # - pass through to try self.function below
+        if isinstance(function, types.FunctionType) or isinstance(function, types.MethodType):
+            self.function_object = UserDefinedFunction(function=function, context=context)
+        elif isinstance(function, Function):
+            if function.owner is None:
+                self.function_object = function
             else:
-                if self.prefs.verbosePref:
-                    warnings.warn("{0} ({1}) is not a subclass of Function".
-                                  format(FUNCTION,
-                                         self.function.__class__.__name__,
-                                         self.name))
-                function = None
+                self.function_object = copy.deepcopy(function)
+        elif inspect.isclass(function) and issubclass(function, Function):
+            self.function_object = function()
 
-        # params[FUNCTION] was not specified (in paramsCurrent, paramInstanceDefaults or paramClassDefaults)
-        if not function:
-            # Try to assign to self.function
-            try:
-                self.function = self.function
-            # If self.function is also not implemented, raise exception
-            # Note: this is a "sanity check," as this should have been checked in _validate_function (above)
-            except AttributeError:
-                raise ComponentError("{0} ({1}) is not a Function object or class, "
-                                    "and {2}.function is not implemented".
-                                    format(FUNCTION, self.function,
-                                           self.__class__.__name__))
-            # If self.function is implemented, warn if in VERBOSE mode
-            else:
-                if self.prefs.verbosePref:
-                    warnings.warn("{0} ({1}) is not a Function object or a specification for one; "
-                                  "{1}.function ({}) will be used instead".
-                                  format(FUNCTION,
-                                         self.function.__self__.componentName,
-                                         self.name,
-                                         self.function.__self__.name))
+        self.function_object.owner = self
 
-        # MAKE ASSIGNMENTS
-        # Now that function has been instantiated:
-
-        #  - assign to paramInstanceDefaults
-        self.paramInstanceDefaults[FUNCTION] = self.function
-
-        #  - for all Components other than a Function itself,
-        #    assign function_object, function_params dict, and function's parameters from any ParameterStates
-        from psyneulink.components.functions.function import Function
-        if not isinstance(self, Function):
-            self.function_object = self.function.__self__
-            if not self.function_object.owner:
-                self.function_object.owner = self
-            elif self.function_object.owner != self:
-                raise ComponentError("Function being assigned to {} ({}) belongs to another Component: {}".
-                                     format(self.name, self.function_object.name, self.function_object.owner.name))
-            # sort to maintain alphabetical order of function_params
-            for param_name in sorted(list(self.function_object.user_params_for_instantiation.keys())):
-                # assign to param to function_params dict
-                self.function_params.__additem__(param_name,
-                                                 self.function_object.user_params_for_instantiation[param_name])
-                # # assign values from any ParameterStates the Component may (which it should) have
-                # try:
-                #     value_type = type(getattr(self.function_object, '_'+param_name))
-                #     param_value = type_match(self._parameter_states[param_name].value, value_type)
-                # except:
-                #     pass
-                # else:
-                #     setattr(self.function_object, '_'+param_name, param_value)
-            self.paramInstanceDefaults[FUNCTION_PARAMS] = self.function_params
-
-        #  - call self.execute to get value, since the value of a Component is defined as what is returned by its
-        #    execute method, not its function
         if not context:
             context = "DIRECT CALL"
         try:
@@ -2922,6 +2773,13 @@ class Component(object):
     def _default_variable_handled(self, value):
         self.__default_variable_handled = value
 
+
+    @property
+    def function(self):
+        try:
+            return self.function_object.function
+        except AttributeError:
+            return None
 
 COMPONENT_BASE_CLASS = Component
 

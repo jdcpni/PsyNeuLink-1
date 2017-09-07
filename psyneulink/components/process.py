@@ -924,7 +924,7 @@ class Process(Process_Base):
         self._instantiate_pathway(context=context)
         # super(Process, self)._instantiate_function(context=context)
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         """Override Function._instantiate_function:
 
         This is necessary to:

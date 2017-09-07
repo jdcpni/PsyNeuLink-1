@@ -918,7 +918,7 @@ class System(System_Base):
         self._instantiate_graph(context=context)
         self._instantiate_learning_graph(context=context)
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         """Suppress validation of function
 
         This is necessary to:

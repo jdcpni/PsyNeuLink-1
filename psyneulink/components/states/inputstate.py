@@ -714,7 +714,7 @@ class InputState(State_Base):
                                   "with its expected format ({})".
                                   format(name, self.componentName, self.owner.name, self.value, reference_value))
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         """Insure that function is LinearCombination and that output is compatible with owner.instance_defaults.variable
 
         Insures that function:
@@ -733,7 +733,7 @@ class InputState(State_Base):
         :return:
         """
 
-        super()._instantiate_function(context=context)
+        super()._instantiate_function(function=function, context=context)
 
         # Insure that function is Function.LinearCombination
         if not isinstance(self.function.__self__, (LinearCombination, Linear)):

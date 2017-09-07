@@ -7202,13 +7202,13 @@ class NavarroAndFuss(IntegratorFunction):
                          prefs=prefs,
                          context=context)
 
-    def _instantiate_function(self, context=None):
+    def _instantiate_function(self, function, context=None):
         print("\nimporting matlab...")
         import matlab.engine
         self.eng1 = matlab.engine.start_matlab('-nojvm')
         print("matlab imported\n")
 
-        super()._instantiate_function(context=context)
+        super()._instantiate_function(function=function, context=context)
 
     def function(self,
                  variable=None,
