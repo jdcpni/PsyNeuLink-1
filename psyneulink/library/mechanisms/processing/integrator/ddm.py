@@ -300,7 +300,7 @@ from psyneulink.components.states.outputstate import SEQUENTIAL
 from psyneulink.globals.keywords import FUNCTION, FUNCTION_PARAMS, INITIALIZING, NAME, OUTPUT_STATES, TIME_SCALE, kwPreferenceSetName
 from psyneulink.globals.preferences.componentpreferenceset import is_pref_set, kpReportOutputPref
 from psyneulink.globals.preferences.preferenceset import PreferenceEntry, PreferenceLevel
-from psyneulink.globals.utilities import np_array_has_single_value
+from psyneulink.globals.utilities import is_same_function_spec, np_array_has_single_value
 from psyneulink.scheduling.timescale import CentralClock, TimeScale
 
 __all__ = [
@@ -774,7 +774,10 @@ class DDM(ProcessingMechanism_Base):
             if isinstance(fun, method_type):
                 fun = fun.__self__.__class__
 
-            if not fun in functions:
+            for function_type in functions:
+                if is_same_function_spec(fun, function_type):
+                    break
+            else:
                 function_names = [fun.componentName for fun in functions]
                 raise DDMError("{} param of {} must be one of the following functions: {}".
                                format(FUNCTION, self.name, function_names))
