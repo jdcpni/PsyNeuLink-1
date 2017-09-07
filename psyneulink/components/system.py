@@ -829,7 +829,6 @@ class System(System_Base):
                                                   targets=targets,
                                                   params=params)
 
-        self.function = self.execute
         self.scheduler_processing = scheduler
         self.scheduler_learning = None
         self.termination_processing = None
@@ -3154,6 +3153,10 @@ class System(System_Base):
 
     def _restore_state(self):
         pass
+
+    @property
+    def function(self):
+        return self.execute
 
     @property
     def mechanisms(self):

@@ -852,7 +852,6 @@ class Process(Process_Base):
                                                   learning_rate=learning_rate,
                                                   target=target,
                                                   params=params)
-        self.function = self.execute
 
         register_category(entry=self,
                           base_class=Process,
@@ -2500,7 +2499,9 @@ class Process(Process_Base):
 
         print ("\n---------------------------------------------------------")
 
-
+    @property
+    def function(self):
+        return self.execute
 
     @property
     def mechanisms(self):
