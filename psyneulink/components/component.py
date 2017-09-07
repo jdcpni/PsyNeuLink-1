@@ -357,7 +357,7 @@ from psyneulink.globals.keywords import COMMAND_LINE, DEFERRED_INITIALIZATION, D
 from psyneulink.globals.log import Log
 from psyneulink.globals.preferences.componentpreferenceset import ComponentPreferenceSet, kpVerbosePref
 from psyneulink.globals.preferences.preferenceset import PreferenceEntry, PreferenceLevel, PreferenceSet
-from psyneulink.globals.utilities import ContentAddressableList, InputError, ReadOnlyOrderedDict, convert_all_elements_to_np_array, convert_to_np_array, is_matrix, is_same_function_spec, iscompatible, kwCompatibilityLength, np_array_has_single_value
+from psyneulink.globals.utilities import ContentAddressableList, InputError, ReadOnlyOrderedDict, convert_all_elements_to_np_array, convert_to_np_array, is_instance_or_subclass, is_matrix, is_same_function_spec, iscompatible, kwCompatibilityLength, np_array_has_single_value
 
 __all__ = [
     'Component', 'COMPONENT_BASE_CLASS', 'component_keywords', 'ComponentError', 'ComponentLog', 'ExecutionStatus',
@@ -911,6 +911,8 @@ class Component(object):
             except TypeError:
                 pass
 
+        if function is None:
+            function = self.ClassDefaults.function
         # VALIDATE VARIABLE AND PARAMS, AND ASSIGN DEFAULTS
 
         # Validate the set passed in and assign to paramInstanceDefaults
@@ -929,7 +931,7 @@ class Component(object):
         self.runtime_params_in_use = False
 
         # VALIDATE FUNCTION (self.function and/or self.params[function, FUNCTION_PARAMS])
-        self._validate_function(context=context)
+        self._validate_function(function=function, context=context)
 
         # INSTANTIATE ATTRIBUTES BEFORE FUNCTION
         # Stub for methods that need to be executed before instantiating function
@@ -2340,7 +2342,7 @@ class Component(object):
 
         return value
 
-    def _validate_function(self, context=None):
+    def _validate_function(self, function, context=None):
         """Check that either params[FUNCTION] and/or self.execute are implemented
 
         # FROM _validate_params:
@@ -2368,19 +2370,11 @@ class Component(object):
 
         :return:
         """
-        # Check if params[FUNCTION] is specified
-        try:
-            param_set = PARAMS_CURRENT
-            function = self._check_FUNCTION(param_set)
-            if not function:
-                param_set = PARAM_INSTANCE_DEFAULTS
-                function, param_set = self._check_FUNCTION(param_set)
-                if not function:
-                    param_set = PARAM_CLASS_DEFAULTS
-                    function, param_set = self._check_FUNCTION(param_set)
 
-        except KeyError:
-            # FUNCTION is not specified, so try to assign self.function to it
+        from psyneulink.components.shellclasses import Function
+
+        # FUNCTION is not specified, so try to assign self.function to it
+        if function is None:
             try:
                 function = self.function
             except AttributeError:
@@ -2388,96 +2382,25 @@ class Component(object):
                 raise ComponentError("{} must either implement a function method, specify one as the FUNCTION param in"
                                     " paramClassDefaults, or as the default for the function argument in its init".
                                     format(self.__class__.__name__, FUNCTION))
-            else:
-                # self.function is None
-                # IMPLEMENTATION NOTE:  This is a coding error;  self.function should NEVER be assigned None
-                if function is None:
-                    raise("PROGRAM ERROR: either {0} must be specified or {1}.function must be implemented for {2}".
-                          format(FUNCTION,self.__class__.__name__, self.name))
-                # self.function is OK, so return
-                elif (isinstance(function, Component) or
-                        isinstance(function, function_type) or
-                        isinstance(function, method_type)):
-                    self.paramsCurrent[FUNCTION] = function
-                    return
-                # self.function is NOT OK, so raise exception
-                else:
-                    raise ComponentError("{0} not specified and {1}.function is not a Function object or class"
-                                        "or valid method in {2}".
-                                        format(FUNCTION, self.__class__.__name__, self.name))
 
-        # paramsCurrent[FUNCTION] was specified, so process it
+        # self.function is None
+        # IMPLEMENTATION NOTE:  This is a coding error;  self.function should NEVER be assigned None
+        if function is None:
+            raise ComponentError("PROGRAM ERROR: either {0} must be specified or {1}.function must be implemented for {2}".
+                  format(FUNCTION,self.__class__.__name__, self.name))
+        # self.function is OK, so return
+        elif (
+            isinstance(function, types.FunctionType)
+            or isinstance(function, types.MethodType)
+            or is_instance_or_subclass(function, Function)
+        ):
+            self.paramsCurrent[FUNCTION] = function
+            return
+        # self.function is NOT OK, so raise exception
         else:
-            # FUNCTION is valid:
-            if function:
-                # - if other than paramsCurrent, report (if in VERBOSE mode) and assign to paramsCurrent
-                if param_set is not PARAMS_CURRENT:
-                    if self.prefs.verbosePref:
-                        warnings.warn("{0} ({1}) is not a Function object or a valid method; {2} ({3}) will be used".
-                                      format(FUNCTION,
-                                             self.paramsCurrent[FUNCTION],
-                                             param_set, function))
-                    self.paramsCurrent[FUNCTION] = function
-
-            # FUNCTION was not valid, so try to assign self.function to it;
-            else:
-                # Try to assign to self.function
-                try:
-                    function = self.function
-                except AttributeError:
-                    # self.function is not implemented, SO raise exception
-                    raise ComponentError("{0} ({1}) is not a Function object or class or valid method, "
-                                        "and {2}.function is not implemented for {3}".
-                                        format(FUNCTION,
-                                               self.paramsCurrent[FUNCTION],
-                                               self.__class__.__name__,
-                                               self.name))
-                else:
-                    # self.function is there and is:
-                    # - OK, so just warn that FUNCTION was no good and that self.function will be used
-                    if (isinstance(function, Component) or
-                            isinstance(function, function_type) or
-                            isinstance(function, method_type)):
-                        if self.prefs.verbosePref:
-                            warnings.warn("{0} ({1}) is not a Function object or class or valid method; "
-                                          "{2}.function will be used instead".
-                                          format(FUNCTION,
-                                                 self.paramsCurrent[FUNCTION],
-                                                 self.__class__.__name__))
-                    # - NOT OK, so raise exception (FUNCTION and self.function were both no good)
-                    else:
-                        raise ComponentError("Neither {0} ({1}) nor {2}.function is a Function object or class "
-                                            "or a valid method in {3}".
-                                            format(FUNCTION, self.paramsCurrent[FUNCTION],
-                                                   self.__class__.__name__, self.name))
-
-    def _check_FUNCTION(self, param_set):
-        """Check FUNCTION param is a Function,
-        """
-
-        function = getattr(self, param_set)[FUNCTION]
-        # If it is a Function object, OK so return
-
-        if (isinstance(function, COMPONENT_BASE_CLASS) or
-                isinstance(function, function_type) or
-                isinstance(function, method_type) or
-                callable(function)):
-
-            return function
-        # Try as a Function class reference
-        else:
-            try:
-                is_subclass = issubclass(self.paramsCurrent[FUNCTION], COMPONENT_BASE_CLASS)
-            # It is not a class reference, so return None
-            except TypeError:
-                return None
-            else:
-                # It IS a Function class reference, so return function
-                if is_subclass:
-                    return function
-                # It is NOT a Function class reference, so return none
-                else:
-                    return None
+            raise ComponentError("{0} not specified and {1}.function is not a Function object or class"
+                                "or valid method in {2}".
+                                format(FUNCTION, self.__class__.__name__, self.name))
 
     def _instantiate_attributes_before_function(self, context=None):
         pass
@@ -2510,9 +2433,6 @@ class Component(object):
         if isinstance(self, Function):
             self.function_object = self
             return
-
-        if function is None:
-            function = self.ClassDefaults.function
 
         if isinstance(function, types.FunctionType) or isinstance(function, types.MethodType):
             self.function_object = UserDefinedFunction(function=function, context=context)
