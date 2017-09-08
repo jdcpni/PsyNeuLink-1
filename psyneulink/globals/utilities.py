@@ -75,13 +75,12 @@ OTHER
 
 import collections
 import inspect
+import logging
 import numbers
+import numpy as np
 import warnings
 
 from enum import Enum, EnumMeta, IntEnum
-
-import numpy as np
-
 from psyneulink.globals.keywords import DISTANCE_METRICS, MATRIX_KEYWORD_VALUES, NAME, VALUE
 
 __all__ = [
@@ -93,6 +92,8 @@ __all__ = [
     'MODULATION_OVERRIDE', 'multi_getattr', 'np_array_less_than_2d', 'np_array_has_single_value', 'optional_parameter_spec', 'parameter_spec',
     'random_matrix', 'ReadOnlyOrderedDict', 'safe_len', 'TEST_CONDTION', 'type_match', 'underscore_to_camelCase', 'UtilitiesError',
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class UtilitiesError(Exception):
@@ -1100,3 +1101,43 @@ def safe_len(arr, fallback=1):
         return len(arr)
     except TypeError:
         return fallback
+
+
+def prune_unused_args(func, args, kwargs):
+    # use the func signature to filter out arguments that aren't compatible
+    sig = inspect.signature(func)
+
+    args_to_pass = list(args)
+    kwargs_to_pass = dict(kwargs)
+
+    has_args_param = False
+    has_kwargs_param = False
+    count_positional = 0
+    func_kwargs_names = set()
+
+    for name, param in sig.parameters.items():
+        if param.kind is inspect.Parameter.VAR_POSITIONAL:
+            has_args_param = True
+        elif param.kind is inspect.Parameter.VAR_KEYWORD:
+            has_kwargs_param = True
+        elif param.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD or param.kind is inspect.Parameter.KEYWORD_ONLY:
+            if param.default is inspect.Parameter.empty:
+                count_positional += 1
+            func_kwargs_names.add(name)
+
+    if not has_args_param:
+        num_extra_args = len(args_to_pass) - count_positional
+        if num_extra_args > 0:
+            logger.info('{1} extra arguments specified to function {0}, will be ignored (values: {2})'.format(func, num_extra_args, args_to_pass[-num_extra_args:]))
+        args = args[:count_positional+1]
+
+    if not has_kwargs_param:
+        filtered = set()
+        for kw in kwargs_to_pass:
+            if kw not in func_kwargs_names:
+                filtered.add(kw)
+        logger.info('{1} extra keyword arguments specified to function {0}, will be ignored (values: {2})'.format(func, len(filtered), filtered))
+        for kw in filtered:
+            del kwargs_to_pass[kw]
+
+    return args_to_pass, kwargs_to_pass
