@@ -445,6 +445,9 @@ class ParamsDict(UserDict):
                 self[FUNCTION_PARAMS].__additem__(param_name, dict[FUNCTION_PARAMS][param_name])
 
     def __getitem__(self, key):
+        if key is FUNCTION:
+            # hack because function is NOT stored as an attribute when this object wants it!
+            return super().__getitem__(key)
 
         try:
             # Try to retrieve from attribute of owner object
@@ -469,6 +472,7 @@ class ParamsDict(UserDict):
         super().__setitem__(key, item)
         # assign value to attrib
         if key is not FUNCTION:
+            # function is not stored as an attribute!
             setattr(self.owner, key, item)
 
 
