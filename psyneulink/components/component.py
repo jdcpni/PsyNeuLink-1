@@ -2445,24 +2445,23 @@ class Component(object):
 
         if isinstance(self, Function):
             self.function_object = self
-            return
-
-        if isinstance(function, types.FunctionType) or isinstance(function, types.MethodType):
-            self.function_object = UserDefinedFunction(function=function, context=context)
-        elif isinstance(function, Function):
-            if function.owner is None:
-                self.function_object = function
-            else:
-                self.function_object = copy.deepcopy(function)
-        elif inspect.isclass(function) and issubclass(function, Function):
-            kwargs_to_instantiate = function.ClassDefaults.values().copy()
-            kwargs_to_instantiate[VARIABLE] = self.instance_defaults.variable
-            _, kwargs = prune_unused_args(function.__init__, args=[], kwargs=kwargs_to_instantiate)
-            self.function_object = function(**kwargs)
         else:
-            raise ComponentError('Unsupported function type: {0}, function={1}'.format(type(function), function))
+            if isinstance(function, types.FunctionType) or isinstance(function, types.MethodType):
+                self.function_object = UserDefinedFunction(function=function, context=context)
+            elif isinstance(function, Function):
+                if function.owner is None:
+                    self.function_object = function
+                else:
+                    self.function_object = copy.deepcopy(function)
+            elif inspect.isclass(function) and issubclass(function, Function):
+                kwargs_to_instantiate = function.ClassDefaults.values().copy()
+                kwargs_to_instantiate[VARIABLE] = self.instance_defaults.variable
+                _, kwargs = prune_unused_args(function.__init__, args=[], kwargs=kwargs_to_instantiate)
+                self.function_object = function(**kwargs)
+            else:
+                raise ComponentError('Unsupported function type: {0}, function={1}'.format(type(function), function))
 
-        self.function_object.owner = self
+            self.function_object.owner = self
 
         if not context:
             context = "DIRECT CALL"
