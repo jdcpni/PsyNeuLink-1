@@ -103,6 +103,14 @@ class UtilitiesError(Exception):
         return repr(self.error_value)
 
 
+class InputError(Exception):
+    def __init__(self, error_value):
+        self.error_value = error_value
+
+    def __str__(self):
+        return repr(self.error_value)
+
+
 MODULATION_OVERRIDE = 'Modulation.OVERRIDE'
 MODULATION_MULTIPLY = 'Modulation.MULTIPLY'
 MODULATION_ADD = 'Modulation.ADD'

@@ -445,6 +445,7 @@ import inspect
 import numbers
 import re
 import warnings
+
 from collections import UserList, namedtuple
 
 import numpy as np
@@ -809,7 +810,7 @@ class Process(Process_Base):
     # Use inputValueSystemDefault as default input to process
 
     class ClassDefaults(Process_Base.ClassDefaults):
-        variable = None
+        variable = np.array([0])
 
     paramClassDefaults = Component.paramClassDefaults.copy()
     paramClassDefaults.update({TIME_SCALE: TimeScale.TRIAL,
@@ -870,6 +871,14 @@ class Process(Process_Base):
                                       prefs=prefs,
                                       context=context)
 
+    def _validate_default_variable(self, default_variable):
+        """
+            Returns
+            -------
+                False if a user-specified default_variable does not conform
+                to the demanded default variable format of `Process`, True otherwise
+        """
+        return isinstance(default_variable, np.ndarray) and default_variable.ndim >= 1
 
     def _validate_variable(self, variable, context=None):
         """Convert ClassDefaults.variable, instance_defaults.variable, and variable to 2D np.array: one 1D value for each input state

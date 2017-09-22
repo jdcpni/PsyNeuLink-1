@@ -428,17 +428,19 @@ import math
 import numbers
 import re
 import warnings
+
 from collections import OrderedDict, namedtuple
 
 import numpy as np
 import typecheck as tc
+
 from toposort import toposort, toposort_flatten
 
 from psyneulink.components.component import Component, ExecutionStatus, InitStatus, function_type
 from psyneulink.components.mechanisms.adaptive.control.controlmechanism import ControlMechanism, OBJECTIVE_MECHANISM
 from psyneulink.components.mechanisms.mechanism import MechanismList
 from psyneulink.components.mechanisms.processing.objectivemechanism import DEFAULT_MONITORED_STATE_EXPONENT, DEFAULT_MONITORED_STATE_MATRIX, DEFAULT_MONITORED_STATE_WEIGHT, ObjectiveMechanism
-from psyneulink.components.process import ProcessList, ProcessTuple, Process
+from psyneulink.components.process import Process, ProcessList, ProcessTuple
 from psyneulink.components.shellclasses import Mechanism, Process_Base, System_Base
 from psyneulink.components.states.inputstate import InputState
 from psyneulink.components.states.state import _parse_state_spec
@@ -774,7 +776,7 @@ class System(System_Base):
 
     # Use inputValueSystemDefault as default input to process
     class ClassDefaults(System_Base.ClassDefaults):
-        variable = None
+        variable = np.array([0])
 
     paramClassDefaults = Component.paramClassDefaults.copy()
     paramClassDefaults.update({TIME_SCALE: TimeScale.TRIAL,
@@ -833,6 +835,8 @@ class System(System_Base):
         self.termination_processing = None
         self.termination_learning = None
 
+        self.origin_mechanisms = MechanismList(self, [])
+
         register_category(entry=self,
                           base_class=System,
                           name=name,
@@ -861,6 +865,15 @@ class System(System_Base):
         #     print("\n{0} initialized with:\n- pathway: [{1}]".
         #           # format(self.name, self.pathwayMechanismNames.__str__().strip("[]")))
         #           format(self.name, self.names.__str__().strip("[]")))
+
+    def _validate_default_variable(self, default_variable):
+        """
+            Returns
+            -------
+                False if a user-specified default_variable does not conform
+                to the demanded default variable format of System, True otherwise
+        """
+        return isinstance(default_variable, np.ndarray) and default_variable.ndim >= 1
 
     def _validate_variable(self, variable, context=None):
         """Convert self.ClassDefaults.variable, self.instance_defaults.variable, and variable to 2D np.array: \
@@ -959,7 +972,7 @@ class System(System_Base):
             processes_spec.append(ProcessTuple(Process(), None))
 
         # If input to system is specified, number of items must equal number of processes with origin mechanisms
-        if input is not None and len(input) != len(self.origin_mechanisms):
+        if not self._variable_not_specified and input is not None and len(input) != len(self.origin_mechanisms):
             raise SystemError("Number of items in input ({}) must equal number of processes ({}) in {} ".
                               format(len(input), len(self.origin_mechanisms),self.name))
 

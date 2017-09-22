@@ -355,7 +355,7 @@ from psyneulink.globals.keywords import COMMAND_LINE, DEFERRED_INITIALIZATION, D
 from psyneulink.globals.log import Log
 from psyneulink.globals.preferences.componentpreferenceset import ComponentPreferenceSet, kpVerbosePref
 from psyneulink.globals.preferences.preferenceset import PreferenceEntry, PreferenceLevel, PreferenceSet
-from psyneulink.globals.utilities import ContentAddressableList, ReadOnlyOrderedDict, convert_all_elements_to_np_array, convert_to_np_array, is_matrix, is_same_function_spec, iscompatible, kwCompatibilityLength, np_array_has_single_value
+from psyneulink.globals.utilities import ContentAddressableList, InputError, ReadOnlyOrderedDict, convert_all_elements_to_np_array, convert_to_np_array, is_matrix, is_same_function_spec, iscompatible, kwCompatibilityLength, np_array_has_single_value
 
 __all__ = [
     'Component', 'COMPONENT_BASE_CLASS', 'component_keywords', 'ComponentError', 'ComponentLog', 'ExecutionStatus',
@@ -2111,6 +2111,15 @@ class Component(object):
                 raise ComponentError(message)
 
         return variable
+
+    def _validate_default_variable(self, default_variable):
+        """
+            Returns
+            -------
+                False if a user-specified default_variable does not conform
+                to the demanded default variable format of Components, True otherwise
+        """
+        return isinstance(default_variable, np.ndarray)
 
     def _validate_params(self, request_set, target_set=None, context=None):
         """Validate params and assign validated values to targets,

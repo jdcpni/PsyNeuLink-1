@@ -1406,6 +1406,15 @@ class Mechanism_Base(Mechanism):
 
         return variable
 
+    def _validate_default_variable(self, default_variable):
+        """
+            Returns
+            -------
+                False if a user-specified default_variable does not conform
+                to the demanded default variable format of Mechanisms, True otherwise
+        """
+        return isinstance(default_variable, np.ndarray) and default_variable.ndim >= 1
+
     def _filter_params(self, params):
         """Add rather than override INPUT_STATES and/or OUTPUT_STATES
 
