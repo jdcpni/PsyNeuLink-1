@@ -5,8 +5,7 @@ from psyneulink.components.component import ComponentError
 from psyneulink.components.functions.function import ConstantIntegrator, Exponential, Linear, Logistic, Reduce, Reinforcement, SoftMax
 from psyneulink.components.functions.function import ExponentialDist, GammaDist, NormalDist, UniformDist, WaldDist
 from psyneulink.components.mechanisms.mechanism import MechanismError
-from psyneulink.components.mechanisms.processing.transfermechanism import TransferError
-from psyneulink.components.mechanisms.processing.transfermechanism import TransferMechanism
+from psyneulink.components.mechanisms.processing.transfermechanism import TransferError, TransferMechanism
 from psyneulink.globals.utilities import UtilitiesError
 
 
@@ -59,7 +58,7 @@ class TestTransferMechanismInputs:
         T = TransferMechanism(
             name='T'
         )
-        assert len(T.instance_defaults.variable) == 1 and len(T.instance_defaults.variable[0]) == 1 and T.instance_defaults.variable[0][0] == 0
+        assert len(T.instance_defaults.variable) == 1 and T.instance_defaults.variable[0] == 0
 
     def test_transfer_mech_inputs_list_of_strings(self):
         with pytest.raises(UtilitiesError) as error_text:
