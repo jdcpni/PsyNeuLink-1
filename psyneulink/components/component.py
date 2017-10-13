@@ -2446,7 +2446,10 @@ class Component(object):
             else:
                 self.function_object = copy.deepcopy(function)
         elif inspect.isclass(function) and issubclass(function, Function):
-            self.function_object = function()
+            kwargs_to_instantiate = function.ClassDefaults.values().copy()
+            kwargs_to_instantiate[VARIABLE] = self.instance_defaults.variable
+            _, kwargs = prune_unused_args(function.__init__, args=[], kwargs=kwargs_to_instantiate)
+            self.function_object = function(**kwargs)
 
         self.function_object.owner = self
 
