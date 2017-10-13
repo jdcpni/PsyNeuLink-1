@@ -2071,16 +2071,6 @@ class Component(object):
             raise ComponentError("Assignment of class ({}) as a variable (for {}) is not allowed".
                                  format(variable.__name__, self.name))
 
-        # If variable is not specified, then:
-        #    - assign to (??now np-converted version of) self.ClassDefaults.variable
-        #    - mark as not having been specified
-        #    - return
-        if variable is None:
-            try:
-                return self.instance_defaults.variable
-            except AttributeError:
-                return self.ClassDefaults.variable
-
         # Otherwise, do some checking on variable before converting to np.ndarray
 
         # If variable is callable (function or object reference), call it and assign return to value to variable
