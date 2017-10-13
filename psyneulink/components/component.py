@@ -347,6 +347,7 @@ import warnings
 
 from collections import Iterable, OrderedDict
 from enum import Enum, IntEnum
+<<<<<<< HEAD
 
 from psyneulink.globals.registry import register_category
 from psyneulink.globals.keywords import COMMAND_LINE, DEFERRED_INITIALIZATION, DEFERRED_DEFAULT_NAME, COMPONENT_INIT, \
@@ -354,6 +355,9 @@ from psyneulink.globals.keywords import COMMAND_LINE, DEFERRED_INITIALIZATION, D
     INIT_FULL_EXECUTE_METHOD, INPUT_STATES, LEARNING, LEARNING_PROJECTION, MAPPING_PROJECTION, NAME, OUTPUT_STATES, \
     PARAMS, PARAMS_CURRENT, PARAM_CLASS_DEFAULTS, PARAM_INSTANCE_DEFAULTS, PREFS_ARG, SEPARATOR_BAR, SET_ATTRIBUTE, \
     SIZE, USER_PARAMS, VALUE, VARIABLE, kwComponentCategory
+=======
+from psyneulink.globals.keywords import AUTO_ASSIGN_MATRIX, COMMAND_LINE, COMPONENT_INIT, CONTEXT, CONTROL, CONTROL_PROJECTION, DEFERRED_DEFAULT_NAME, FUNCTION, FUNCTION_CHECK_ARGS, FUNCTION_PARAMS, INITIALIZING, INIT_FULL_EXECUTE_METHOD, INPUT_STATES, LEARNING, LEARNING_PROJECTION, NAME, OUTPUT_STATES, PARAMS, PARAMS_CURRENT, PREFS_ARG, SEPARATOR_BAR, SET_ATTRIBUTE, SIZE, USER_PARAMS, VALUE, VARIABLE, kwComponentCategory
+>>>>>>> add matrix ClassDefault to Component
 from psyneulink.globals.log import Log
 from psyneulink.globals.preferences.componentpreferenceset import ComponentPreferenceSet, kpVerbosePref
 from psyneulink.globals.preferences.preferenceset import PreferenceEntry, PreferenceLevel, PreferenceSet
@@ -713,7 +717,12 @@ class Component(object):
     class ClassDefaults(Defaults):
         function = None
         exclude_from_parameter_states = [INPUT_STATES, OUTPUT_STATES]
+<<<<<<< HEAD
         variable = np.array(0)
+=======
+        variable = np.array([0])
+        matrix = AUTO_ASSIGN_MATRIX
+>>>>>>> add matrix ClassDefault to Component
 
     class InstanceDefaults(Defaults):
         def __init__(self, owner, **kwargs):
