@@ -362,19 +362,21 @@ def iscompatible(candidate, reference=None, **kargs):
     # If reference is provided, assign specification local_variables to reference-based values
     else:
         match_type = type(reference)
-        # If length specification is non-zero (i.e., use length) and reference is an object for which len is defined:
-        if (kargs[kwCompatibilityLength] and
-                (isinstance(reference, (list, tuple, dict)) or
-                         isinstance(reference, np.ndarray) and reference.ndim)
-            ):
-            match_length = len(reference)
-        else:
-            match_length = 0
+        if isinstance(reference, np.ndarray) and reference.ndim == 0 and np.isreal(reference):
+            number_only = True
+            match_length = 1
         # If reference is not a number, then don't require the candidate to be one
-        if not isinstance(reference, numbers.Number):
+        elif not isinstance(reference, numbers.Number):
             number_only = False
         else:
             number_only = kargs[kwCompatibilityNumeric]
+
+        # If length specification is non-zero (i.e., use length) and reference is an object for which len is defined:
+        if kargs[kwCompatibilityLength] and isinstance(reference, (list, tuple, dict, np.ndarray)):
+            if isinstance(reference, np.ndarray) and reference.ndim != 0:
+                match_length = len(reference)
+        else:
+            match_length = 0
 
     if match_length < 0:
         # if settings & Settings.VERBOSE:

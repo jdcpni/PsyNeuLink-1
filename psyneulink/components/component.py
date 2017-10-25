@@ -2071,14 +2071,6 @@ class Component(object):
             raise ComponentError("Assignment of class ({}) as a variable (for {}) is not allowed".
                                  format(variable.__name__, self.name))
 
-        pre_converted_variable_class_default = self.ClassDefaults.variable
-
-        # FIX: SAYS "list of np.ndarrays" BELOW, WHICH WOULD BE A 2D ARRAY, BUT CONVERSION BELOW ONLY INDUCES 1D ARRAY
-        # FIX: NOTE:  VARIABLE (BELOW) IS CONVERTED TO ONLY 1D ARRAY
-        # Convert self.ClassDefaults.variable to list of np.ndarrays
-        self.ClassDefaults.variable = convert_to_np_array(self.ClassDefaults.variable, 1)
-        self.instance_defaults.variable = convert_to_np_array(self.instance_defaults.variable, 1)
-
         # If variable is not specified, then:
         #    - assign to (??now np-converted version of) self.ClassDefaults.variable
         #    - mark as not having been specified
@@ -2107,7 +2099,7 @@ class Component(object):
         if self.variableClassDefault_locked:
             if not variable.dtype is self.ClassDefaults.variable.dtype:
                 message = "Variable for {0} (in {1}) must be a {2}".\
-                    format(self.componentName, context, pre_converted_variable_class_default.__class__.__name__)
+                    format(self.componentName, context, self.ClassDefaults.variable.__class__.__name__)
                 raise ComponentError(message)
 
         return variable

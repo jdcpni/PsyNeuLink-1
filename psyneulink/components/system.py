@@ -884,8 +884,6 @@ class System(System_Base):
         # Force System variable specification to be a 2D array (to accommodate multiple input states of 1st mech(s)):
         if variable is None:
             return
-        self.ClassDefaults.variable = convert_to_np_array(self.ClassDefaults.variable, 2)
-        self.instance_defaults.variable = convert_to_np_array(self.instance_defaults.variable, 2)
 
         return convert_to_np_array(variable, 2)
 
@@ -1518,7 +1516,7 @@ class System(System_Base):
             for input_state in mech.input_states:
                 orig_mech_input.append(input_state.value)
             self.instance_defaults.variable.append(orig_mech_input)
-        self.instance_defaults.variable = convert_to_np_array(self.instance_defaults.variable, 2)
+
         # should add Utility to allow conversion to 3D array
         # MODIFIED 2/8/17 END
         # An example: when input state values are vectors, then self.instance_defaults.variable is a 3D array because
