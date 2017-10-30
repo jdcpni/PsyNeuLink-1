@@ -705,7 +705,7 @@ class Component(object):
 
     class ClassDefaults(Defaults):
         exclude_from_parameter_states = [INPUT_STATES, OUTPUT_STATES]
-        variable = np.array([0])
+        variable = np.array(0)
 
     class InstanceDefaults(Defaults):
         def __init__(self, **kwargs):

@@ -224,6 +224,7 @@ Class Reference
 ---------------
 
 """
+import numpy as np
 import typecheck as tc
 
 from psyneulink.components.functions.function import Integrator, MULTIPLICATIVE_PARAM, ModulationParam, _is_modulation_param
@@ -373,7 +374,7 @@ class LCMechanism(ControlMechanism):
 
     class ClassDefaults(AdaptiveMechanism_Base.ClassDefaults):
         # This must be a list, as there may be more than one (e.g., one per control_signal)
-        variable = defaultControlAllocation
+        variable = np.array(defaultControlAllocation)
 
     paramClassDefaults = ControlMechanism.paramClassDefaults.copy()
     paramClassDefaults.update({FUNCTION:Integrator,

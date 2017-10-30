@@ -272,10 +272,6 @@ class AGTControlMechanism(ControlMechanism):
     #     kwPreferenceSetName: 'ControlMechanismClassPreferences',
     #     kp<pref>: <setting>...}
 
-    class ClassDefaults(AdaptiveMechanism_Base.ClassDefaults):
-        # This must be a list, as there may be more than one (e.g., one per control_signal)
-        variable = defaultControlAllocation
-
     from psyneulink.components.functions.function import Linear
     paramClassDefaults = ControlMechanism.paramClassDefaults.copy()
     paramClassDefaults.update({CONTROL_SIGNALS: None,

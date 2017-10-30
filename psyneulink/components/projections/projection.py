@@ -559,9 +559,6 @@ class Projection_Base(Projection):
     className = componentCategory
     suffix = " " + className
 
-    class ClassDefaults(Projection.ClassDefaults):
-        variable = [0]
-
     registry = ProjectionRegistry
 
     classPreferenceLevel = PreferenceLevel.CATEGORY

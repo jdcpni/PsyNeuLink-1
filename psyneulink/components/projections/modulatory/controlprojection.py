@@ -277,9 +277,6 @@ class ControlProjection(ModulatoryProjection_Base):
         sender=[CONTROL_SIGNAL]
         receiver=[PARAMETER_STATE]
 
-    class ClassDefaults(ModulatoryProjection_Base.ClassDefaults):
-        variable = 0.0
-
     paramClassDefaults = Projection_Base.paramClassDefaults.copy()
     paramClassDefaults.update({
         PROJECTION_SENDER: ControlMechanism,

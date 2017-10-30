@@ -86,10 +86,6 @@ class ProcessingMechanism_Base(Mechanism_Base):
     #     kwPreferenceSetName: 'ProcessingMechanismClassPreferences',
     #     kp<pref>: <setting>...}
 
-    class ClassDefaults(Mechanism_Base.ClassDefaults):
-        # This must be a list, as there may be more than one (e.g., one per control_signal)
-        variable = defaultControlAllocation
-
     def __init__(self,
                  default_variable=None,
                  size=None,

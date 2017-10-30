@@ -92,6 +92,7 @@ Class Reference
 ---------------
 
 """
+import numpy as np
 
 from psyneulink.components.mechanisms.mechanism import Mechanism_Base
 from psyneulink.globals.defaults import defaultControlAllocation
@@ -139,10 +140,6 @@ class AdaptiveMechanism_Base(Mechanism_Base):
     # classPreferences = {
     #     kwPreferenceSetName: 'AdaptiveMechanismClassPreferences',
     #     kp<pref>: <setting>...}
-
-    class ClassDefaults(Mechanism_Base.ClassDefaults):
-        # This must be a list, as there may be more than one (e.g., one per control_signal)
-        variable = defaultControlAllocation
 
     def __init__(self,
                  default_variable,
