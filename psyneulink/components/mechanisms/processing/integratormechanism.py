@@ -179,6 +179,11 @@ class IntegratorMechanism(ProcessingMechanism_Base):
         kwPreferenceSetName: 'IntegratorMechanismCustomClassPreferences',
         kpReportOutputPref: PreferenceEntry(True, PreferenceLevel.INSTANCE)}
 
+    class ClassDefaults(ProcessingMechanism_Base.ClassDefaults):
+        from psyneulink.components.functions.function import AdaptiveIntegrator
+
+        function = AdaptiveIntegrator(rate=0.5)
+
     paramClassDefaults = ProcessingMechanism_Base.paramClassDefaults.copy()
     paramClassDefaults.update({
         # TIME_SCALE: TimeScale.TRIAL,

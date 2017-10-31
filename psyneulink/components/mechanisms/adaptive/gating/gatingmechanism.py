@@ -328,8 +328,10 @@ class GatingMechanism(AdaptiveMechanism_Base):
     #     kp<pref>: <setting>...}
 
     class ClassDefaults(AdaptiveMechanism_Base.ClassDefaults):
+        from psyneulink.components.functions.function import Linear
         # This must be a list, as there may be more than one (e.g., one per GATING_SIGNAL)
         variable = np.array(defaultGatingPolicy)
+        function = Linear
 
     from psyneulink.components.functions.function import Linear
     paramClassDefaults = Mechanism_Base.paramClassDefaults.copy()

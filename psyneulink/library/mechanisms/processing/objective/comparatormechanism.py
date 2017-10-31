@@ -308,6 +308,7 @@ class ComparatorMechanism(ObjectiveMechanism):
     class ClassDefaults(ObjectiveMechanism.ClassDefaults):
         # By default, ComparatorMechanism compares two 1D np.array input_states
         variable = np.array([[0], [0]])
+        function = LinearCombination(weights=[[-1], [1]])
 
     # ComparatorMechanism parameter and control signal assignments):
     paramClassDefaults = Mechanism_Base.paramClassDefaults.copy()

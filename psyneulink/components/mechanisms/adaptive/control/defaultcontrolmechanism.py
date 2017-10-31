@@ -91,6 +91,11 @@ class DefaultControlMechanism(ControlMechanism):
     #     kwPreferenceSetName: 'DefaultControlMechanismCustomClassPreferences',
     #     kp<pref>: <setting>...}
 
+    class ClassDefaults(ControlMechanism.ClassDefaults):
+        from psyneulink.components.functions.function import Linear
+        # This must be a list, as there may be more than one (e.g., one per control_signal)
+        function = Linear
+
     from psyneulink.components.functions.function import Linear
     paramClassDefaults = ControlMechanism.paramClassDefaults.copy()
     paramClassDefaults.update({FUNCTION:Linear,

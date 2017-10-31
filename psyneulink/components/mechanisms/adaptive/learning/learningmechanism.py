@@ -827,7 +827,8 @@ class LearningMechanism(AdaptiveMechanism_Base):
 
     classPreferenceLevel = PreferenceLevel.TYPE
 
-    # ClassDefaults.variable = None
+    class ClassDefaults(AdaptiveMechanism_Base.ClassDefaults):
+        function = BackPropagation
 
     paramClassDefaults = AdaptiveMechanism_Base.paramClassDefaults.copy()
     paramClassDefaults.update({

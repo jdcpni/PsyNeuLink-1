@@ -614,6 +614,9 @@ class InputState(State_Base):
     variableEncodingDim = 1
     valueEncodingDim = 1
 
+    class ClassDefaults(State_Base.ClassDefaults):
+        function = LinearCombination(operation=SUM)
+
     paramClassDefaults = State_Base.paramClassDefaults.copy()
     paramClassDefaults.update({PROJECTION_TYPE: MAPPING_PROJECTION,
                                MECHANISM: None,     # These are used to specifiy InputStates by projections to them

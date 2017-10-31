@@ -203,7 +203,7 @@ from psyneulink.components.component import InitStatus, component_keywords
 from psyneulink.components.shellclasses import Mechanism, State
 from psyneulink.components.states.outputstate import OutputState
 from psyneulink.components.states.state import StateError, State_Base
-from psyneulink.globals.keywords import MECHANISM, MODULATION, MODULATORY_SIGNAL, PROJECTIONS
+from psyneulink.globals.keywords import MECHANISM, MODULATION, MODULATORY_SIGNAL, PROJECTIONS, SUM
 from psyneulink.globals.preferences.preferenceset import PreferenceLevel
 
 __all__ = [
@@ -362,6 +362,10 @@ class ModulatorySignal(OutputState):
     # classPreferences = {
     #     kwPreferenceSetName: 'OutputStateCustomClassPreferences',
     #     kp<pref>: <setting>...}
+
+    class ClassDefaults(OutputState.ClassDefaults):
+        from psyneulink.components.functions.function import LinearCombination
+        function = LinearCombination(operation=SUM)
 
     paramClassDefaults = State_Base.paramClassDefaults.copy()
 

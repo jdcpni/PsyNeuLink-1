@@ -608,6 +608,15 @@ class DDM(ProcessingMechanism_Base):
         kwPreferenceSetName: 'DDMCustomClassPreferences',
         kpReportOutputPref: PreferenceEntry(False, PreferenceLevel.INSTANCE)}
 
+    class ClassDefaults(ProcessingMechanism_Base.ClassDefaults):
+        function = BogaczEtAl(
+            drift_rate=1.0,
+            starting_point=0.0,
+            threshold=1.0,
+            noise=0.5,
+            t0=.200
+        )
+
     paramClassDefaults = Mechanism_Base.paramClassDefaults.copy()
     paramClassDefaults.update({
         TIME_SCALE: TimeScale.TRIAL,

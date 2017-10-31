@@ -433,6 +433,9 @@ class KWTA(RecurrentTransferMechanism):
 
     componentType = KWTA
 
+    class ClassDefaults(RecurrentTransferMechanism.ClassDefaults):
+        function = Logistic
+
     paramClassDefaults = RecurrentTransferMechanism.paramClassDefaults.copy()
     paramClassDefaults.update({'function': Logistic})  # perhaps hacky? not sure (7/10/17 CW)
 

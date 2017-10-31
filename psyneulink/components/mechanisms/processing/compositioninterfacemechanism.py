@@ -127,6 +127,9 @@ class CompositionInterfaceMechanism(ProcessingMechanism_Base):
         kwPreferenceSetName: 'CompositionInterfaceMechanismCustomClassPreferences',
         kpReportOutputPref: PreferenceEntry(True, PreferenceLevel.INSTANCE)}
 
+    class ClassDefaults(ProcessingMechanism_Base.ClassDefaults):
+        function = Linear
+
     paramClassDefaults = Mechanism_Base.paramClassDefaults.copy()
     paramClassDefaults.update({})
     paramNames = paramClassDefaults.keys()
