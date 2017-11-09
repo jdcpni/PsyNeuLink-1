@@ -663,7 +663,7 @@ class DDM(ProcessingMechanism_Base):
         from psyneulink.components.states.outputstate import StandardOutputStates
         self.standard_output_states = StandardOutputStates(self, DDM_standard_output_states, SEQUENTIAL)
 
-        super(DDM, self).__init__(variable=default_variable,
+        super(DDM, self).__init__(default_variable=default_variable,
                                   output_states=output_states,
                                   params=params,
                                   name=name,

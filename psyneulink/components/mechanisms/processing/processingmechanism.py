@@ -91,7 +91,7 @@ class ProcessingMechanism_Base(Mechanism_Base):
         variable = defaultControlAllocation
 
     def __init__(self,
-                 variable=None,
+                 default_variable=None,
                  size=None,
                  input_states=None,
                  output_states=None,
@@ -111,7 +111,7 @@ class ProcessingMechanism_Base(Mechanism_Base):
 
         self.system = None
 
-        super().__init__(variable=variable,
+        super().__init__(default_variable=default_variable,
                          size=size,
                          input_states=input_states,
                          output_states=output_states,

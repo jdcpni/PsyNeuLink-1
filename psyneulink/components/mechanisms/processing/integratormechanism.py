@@ -218,7 +218,7 @@ class IntegratorMechanism(ProcessingMechanism_Base):
 
         # self.size = size
 
-        super(IntegratorMechanism, self).__init__(variable=default_variable,
+        super(IntegratorMechanism, self).__init__(default_variable=default_variable,
                                                   size=size,
                                                   params=params,
                                                   name=name,
