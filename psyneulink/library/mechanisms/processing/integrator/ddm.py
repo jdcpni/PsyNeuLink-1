@@ -337,7 +337,7 @@ class DDM_OUTPUT():
       • `analytic mode <DDM_Analytic_Mode>`: the value of the threshold crossed by the decision variable on the
         current TRIAL (which is either the value of the DDM `function <DDM.function>`'s threshold attribute or its
         negative); \n
-      • `integration mode <DDM_Integration_Mode>`: the value of the decision variable at the current TIME_STEP of 
+      • `integration mode <DDM_Integration_Mode>`: the value of the decision variable at the current TIME_STEP of
         execution. \n
       Corresponds to the 1st item of the DDM's `value <DDM.value>`.
 
@@ -347,7 +347,7 @@ class DDM_OUTPUT():
       • `analytic mode <DDM_Analytic_Mode>`: mean time (in seconds) for the decision variable to reach the positive
         or negative value of the DDM `function <DDM.function>`'s threshold attribute as estimated by the analytic
         solution calculated by the `function <DDM.function>`); \n
-      • `integration mode <DDM_Integration_Mode>`: the number of `TIME_STEP` that have occurred since the DDM began 
+      • `integration mode <DDM_Integration_Mode>`: the number of `TIME_STEP` that have occurred since the DDM began
         to execute in the current `TRIAL` or, if it has reached the positive or negative value of the DDM `function
         <DDM.function>`'s threshold attribute, the `TIME_STEP` at which that occurred. \n
       Corresponds to the 2nd item of the DDM's `value <DDM.value>`.
@@ -610,7 +610,7 @@ class DDM(ProcessingMechanism_Base):
 
     class ClassDefaults(ProcessingMechanism_Base.ClassDefaults):
         # Assigned in __init__ to match default staring_point
-        variable = None
+        variable = np.array([0])
 
     paramClassDefaults = Mechanism_Base.paramClassDefaults.copy()
     paramClassDefaults.update({
@@ -653,9 +653,9 @@ class DDM(ProcessingMechanism_Base):
         # compared to other mechanisms: see TransferMechanism.py __init__ function for a more normal example.
         if default_variable is None and size is None:
             try:
-                default_variable = params[FUNCTION_PARAMS][STARTING_POINT]
-            except:
-                default_variable = 0.0
+                default_variable = np.atleast_1d(params[FUNCTION_PARAMS][STARTING_POINT])
+            except KeyError:
+                pass
 
         # # Conflict with above
         # self.size = size
