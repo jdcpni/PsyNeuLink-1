@@ -1,6 +1,7 @@
+import numpy as np
 import pytest
 import typecheck
-import numpy as np
+
 from psyneulink.components.component import ComponentError
 from psyneulink.components.functions.function import BogaczEtAl, DriftDiffusionIntegrator, FunctionError, NormalDist
 from psyneulink.library.mechanisms.processing.integrator.ddm import DDM, DDMError
@@ -256,7 +257,7 @@ def test_DDM_input_list_len_2():
             time_scale=TimeScale.TIME_STEP
         )
         float(T.execute(stim)[0])
-    assert "must have only a single numeric item" in str(error_text.value)
+    assert "single numeric item" in str(error_text.value)
 
 # ------------------------------------------------------------------------------------------------
 # TEST 2
@@ -504,7 +505,7 @@ def test_DDM_size_too_large():
             ),
             time_scale=TimeScale.TIME_STEP
         )
-    assert "must have only a single numeric item" in str(error_text.value)
+    assert "single numeric item" in str(error_text.value)
 
 # ------------------------------------------------------------------------------------------------
 # TEST 4

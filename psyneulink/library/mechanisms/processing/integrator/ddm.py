@@ -300,6 +300,7 @@ from psyneulink.components.states.outputstate import SEQUENTIAL
 from psyneulink.globals.keywords import FUNCTION, FUNCTION_PARAMS, INITIALIZING, NAME, OUTPUT_STATES, TIME_SCALE, kwPreferenceSetName
 from psyneulink.globals.preferences.componentpreferenceset import is_pref_set, kpReportOutputPref
 from psyneulink.globals.preferences.preferenceset import PreferenceEntry, PreferenceLevel
+from psyneulink.globals.utilities import np_array_has_single_value
 from psyneulink.scheduling.timescale import CentralClock, TimeScale
 
 __all__ = [
@@ -743,14 +744,11 @@ class DDM(ProcessingMechanism_Base):
         Remove when MULTIPROCESS DDM is implemented.
         """
         # this test may become obsolete when size is moved to Component.py
-        if len(variable) > 1:
+        if not np_array_has_single_value(variable) and not np_array_has_single_value(np.array(variable)):
             raise DDMError("Length of input to DDM ({}) is greater than 1, implying there are multiple "
                            "input states, which is currently not supported in DDM, but may be supported"
                            " in the future under a multi-process DDM. Please use a single numeric "
                            "item as the default_variable, or use size = 1.".format(variable))
-        # MODIFIED 6/28/17 (CW): changed len(variable) > 1 to len(variable[0]) > 1
-        if not isinstance(variable, numbers.Number) and len(variable[0]) > 1:
-            raise DDMError("Input to DDM ({}) must have only a single numeric item".format(variable))
         return super()._validate_variable(variable=variable, context=context)
 
     # MODIFIED 11/21/16 END
