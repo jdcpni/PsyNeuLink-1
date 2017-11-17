@@ -708,9 +708,27 @@ class Component(object):
         variable = np.array(0)
 
     class InstanceDefaults(Defaults):
-        def __init__(self, **kwargs):
+        def __init__(self, owner, **kwargs):
+            self.owner = owner
+
             for param in kwargs:
                 setattr(self, param, kwargs[param])
+
+        def __setattr__(self, name, value):
+            validate_default = '_validate_default_{0}'.format(name)
+
+            # skip 'owner' attribute so that it can be set normally at init time
+            # call attached validate function to see if value is a valid assignment, then set
+            # if validate function doesn't exist, just set
+            if name != 'owner' and hasattr(self.owner, validate_default):
+                if not getattr(self.owner, validate_default)(value):
+                    valid_value = getattr(self.owner.ClassDefaults, name)
+                    raise InputError(
+                        'Invalid assignment to {0}.instance_defaults.{1}: {2} (type {3}); example valid assignment: {4} (type: {5})'.format(
+                            self.owner, name, value, type(value), valid_value, type(valid_value)
+                        )
+                    )
+            super().__setattr__(name, value)
 
         def values(self):
             return self._attributes()
@@ -800,7 +818,7 @@ class Component(object):
             default_variable = v
             defaults[VARIABLE] = default_variable
 
-        self.instance_defaults = self.InstanceDefaults(**defaults)
+        self.instance_defaults = self.InstanceDefaults(self, **defaults)
 
         # These ensure that subclass values are preserved, while allowing them to be referred to below
         self.paramInstanceDefaults = {}
