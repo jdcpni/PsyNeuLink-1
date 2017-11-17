@@ -1254,15 +1254,9 @@ class Mechanism_Base(Mechanism):
         -------
             an at-least-two-dimensional form of **variable**
         '''
-        if isinstance(variable, numbers.Number):
-            variable = [[variable]]
-        elif isinstance(variable, list):
-            if all([not isinstance(x, Iterable) for x in variable]):
-                variable = [variable]
-        elif isinstance(variable, np.ndarray):
-            variable = np.atleast_2d(variable)
+        variable = super()._parse_arg_variable(variable)
 
-        return variable
+        return np.atleast_1d(variable)
 
     def _parse_arg_input_states(self, input_states):
         '''
